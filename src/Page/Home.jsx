@@ -1,6 +1,8 @@
 import axios from "axios";
 import { Button, TextInput } from "flowbite-react";
 import React, { useEffect, useState } from "react";
+import AddTaskForm from "../components/AddTaskForm";
+import TaskList from "../components/TaskList";
 
 const Home = () => {
   const [formData, setFormData] = useState({
@@ -34,6 +36,26 @@ const Home = () => {
       .catch((err) => alert(err.response.data));
   };
 
+  // Complete
+  const conpleteTask = (name) => {
+    axios({
+      url: `https://svcy.myclass.vn/api/ToDoList/doneTask?taskName=${name}`,
+      method: "PUT",
+    })
+      .then((res) => getAllTask())
+      .catch((err) => console.log(err));
+  };
+
+  // Reject
+  const rejectTask = (name) => {
+    axios({
+      url: `https://svcy.myclass.vn/api/ToDoList/rejectTask?taskName=${name}`,
+      method: "PUT",
+    })
+      .then((res) => getAllTask())
+      .catch((err) => console.log(err));
+  };
+
   //   Delete
   const deleteTask = (name) => {
     axios({
@@ -43,7 +65,7 @@ const Home = () => {
       .then((res) => getAllTask())
       .catch((err) => console.log(err));
   };
-
+  // get All task
   const getAllTask = () => {
     axios({
       url: "https://svcy.myclass.vn/api/ToDoList/GetAllTask",
@@ -62,62 +84,18 @@ const Home = () => {
         <h1 className="text-2xl font-bold">ToDoList</h1>
         <div className="p-4">
           {/* Form */}
-          <form onSubmit={handleSubmit}>
-            <div className="flex items-center space-x-1">
-              <TextInput
-                id="text"
-                name="taskName"
-                className="w-full"
-                type="text"
-                placeholder="text"
-                onChange={onChangeInput}
-              />
-              <Button type="submit">Add</Button>
-            </div>
-          </form>
+          <AddTaskForm
+            handleSubmit={handleSubmit}
+            onChangeInput={onChangeInput}
+            formData={formData}
+          />
 
-          <div>
-            {data?.map((item) => {
-              return (
-                <div className="flex items-center justify-between bg-white p-2 rounded-md my-2">
-                  <p>{item.taskName}</p>
-                  <div className="flex space-x-2">
-                    {item.status ? (
-                      <>
-                        <Button color="warning" size="xs">
-                          Reject
-                        </Button>
-                        <Button
-                          gradientMonochrome="failure"
-                          size="xs"
-                          onClick={() => {
-                            deleteTask(item.taskName);
-                          }}
-                        >
-                          Delete
-                        </Button>
-                      </>
-                    ) : (
-                      <>
-                        <Button gradientMonochrome="success" size="xs">
-                          Complete
-                        </Button>
-                        <Button
-                          gradientMonochrome="failure"
-                          size="xs"
-                          onClick={() => {
-                            deleteTask(item.taskName);
-                          }}
-                        >
-                          Delete
-                        </Button>
-                      </>
-                    )}
-                  </div>
-                </div>
-              );
-            })}
-          </div>
+          <TaskList
+            data={data}
+            deleteTask={deleteTask}
+            conpleteTask={conpleteTask}
+            rejectTask={rejectTask}
+          />
         </div>
       </div>
     </div>
